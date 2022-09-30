@@ -1,4 +1,8 @@
 
+// #3 - response.data??
+
+
+
 const express = require('express');
 const app = express();
 const port = 5000;
@@ -102,9 +106,9 @@ function findUserById(id) {
     } */
 app.post('/users', (req, res) => {
     const userToAdd = req.body;
+    userToAdd.id = idGenerator();
     addUser(userToAdd);
-    res.send(users['users_list']);
-    res.status(200).end();
+    res.status(201).send(userToAdd).end();
 });
 
 // create new user for post
@@ -115,16 +119,32 @@ function addUser(user){
 // REST - delete by id
 app.delete('/users/:id', (req, res) => {
     const id = req.params['id'];
-    deleteUserById(id);
-    res.send(users['users_list']);
-    res.status(200).end();
+    let result = deleteUserById(id);
+    if (result === undefined || result.length == 0)
+        res.status(404).send('Resource not found.');
+    else {
+        res.status(204).send(users).end();
+    }
 });
 
 // helper - delete user from user_list
 function deleteUserById(id) {
     const user = users['users_list'].find( (user) => user['id'] === id); 
     const indId = users['users_list'].indexOf(user);
-    return users['users_list'].splice(indId, 1);
+    if(indId){
+        return users['users_list'].splice(indId, 1);
+    }
+    else{
+        return undefined;
+    }
+}
+
+function idGenerator(){
+    let id = (Math.random()+1).toString(36).substring(7);
+    while(findUserById(id) !== undefined){
+        id = (Math.random()+1).toString(36).substring(7);
+    }
+    return id;
 }
 
 app.listen(port, () => {

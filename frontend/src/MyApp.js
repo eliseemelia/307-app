@@ -6,7 +6,6 @@ import axios from 'axios';
 
 function MyApp() {
   const [characters, setCharacters] = useState([]);
-
   useEffect(() => {
     fetchAll().then( result => {
       if (result) 
@@ -14,16 +13,32 @@ function MyApp() {
     });
   }, [] );
   
-  function removeOneCharacter (index) {
-    const updated = characters.filter((character, i) => {
-      return i !== index
+  function removeOneCharacter (index, id) {
+    makeDeleteCall(id).then( result => {
+      if (result && result.status === 204){
+        const updated = characters.filter((character, i) => {
+          return i !== index
+        });
+        setCharacters(updated);
+      }
     });
-    setCharacters(updated);
+  }
+
+  async function makeDeleteCall(id) {
+    try {
+      const response = await axios.delete('http://localhost:5000/users', id);
+      
+      return response.data.users_list;
+    }
+    catch (error){
+      console.log(error);
+      return false;
+    }
   }
 
   function updateList(person) {
     makePostCall(person).then( result => {
-      if (result && result.status === 200)
+      if (result && result.status === 201)
         setCharacters([...characters, person]);
     });
   }
