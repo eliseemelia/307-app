@@ -1,6 +1,7 @@
 
 // #3 - response.data??
-
+// #4 - delete update on page?
+// #5 - id update on page without refresh?
 
 
 const express = require('express');
@@ -120,7 +121,7 @@ function addUser(user){
 app.delete('/users/:id', (req, res) => {
     const id = req.params['id'];
     let result = deleteUserById(id);
-    if (result === undefined || result.length == 0)
+    if (result === undefined)
         res.status(404).send('Resource not found.');
     else {
         res.status(204).send(users).end();
@@ -131,16 +132,11 @@ app.delete('/users/:id', (req, res) => {
 function deleteUserById(id) {
     const user = users['users_list'].find( (user) => user['id'] === id); 
     const indId = users['users_list'].indexOf(user);
-    if(indId){
-        return users['users_list'].splice(indId, 1);
-    }
-    else{
-        return undefined;
-    }
+    return users['users_list'].splice(indId, 1);
 }
 
 function idGenerator(){
-    let id = (Math.random()+1).toString(36).substring(7);
+    let id = (Math.random()+1).toString(36).substring(6);
     while(findUserById(id) !== undefined){
         id = (Math.random()+1).toString(36).substring(7);
     }
